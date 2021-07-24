@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<head>
+  <title>Todo App</title>
+  <script
+    src="https://code.jquery.com/jquery-3.5.1.min.js"
+    integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
+    crossorigin="anonymous"
+  ></script>
+  <link rel="shortcut icon" href="#" />
+  <link rel="stylesheet" href="/css/style.css" type="text/css" />
+  <link
+    href="https://fonts.googleapis.com/css?family=Baloo+Bhai|Candal|Chewy&display=swap"
+    rel="stylesheet"
+  />
+  <link
+    rel="stylesheet"
+    href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
+    integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay"
+    crossorigin="anonymous"
+  />
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+    crossorigin="anonymous"
+  />
+</head>
+<body>
+  <div class="todo-container">
+    <div class="form-check form-switch">
+      <input class="form-check-input" type="checkbox" id="switchEditMode">
+      <label class="form-check-label" for="switchEditMode">Edit Mode</label>
+    </div>
+    <div class="row justify-content-md-center">
+      <div class="col-md-auto">
+        <br />
+        <!-- NEW TASK LIST FORM -->
+        <form action="/tasklist" method="POST" class="">
+          <input type="text" name="text" value="New Task List" />
+          <button type="submit">
+            <span class="fas fa-plus"></span>
+          </button>
+          <input type="date" id="due" name="dueDate" class="datePick" />
+        </form>
+        <br />
+
+        <!-- TASK LIST CARD -->
+        <% tasklists.forEach(tlist => { %>
+        <div class="shadow-lg p-3 mb-4 bg-white rounded tasklist-card" id="">
+          <h2 style="display: inline" id="label-<%= tlist._id %>"><%= tlist.text %></h2>
+
+          <input type="hidden" class="list-editbox list-edit-submit" id="input-<%= tlist._id %>" value="<%= tlist.text %>">
+          <input type="hidden" id="editdate-<%= tlist._id %>" class="newDueDate" value="<%= new Date(tlist.dueDate).toISOString().substr(0, 10) %>" />
+          
+          <!-- tags -->
+          <div id="tasklist-tags-<%= tlist._id %>" class="tasklist-tags">
+            <% tlist.tags.forEach(tag => { %>
+              <span id="<%= tag._id %>" class="badge bg-secondary badge-editmode list-badge"><%= tag.tag %> </span>  
+            <% }); %>
+          </div>
+          <a href="#" class="editmode hideme add-tag-tlist" id="<%= tlist._id %>"><span class="badge bg-primary">+</span></a>
+
+          <a href="#" class="edit editmode hideme edit-tasklist" id="<%= tlist._id %>">
+            <span class="fas fa-edit"> </span>
+          </a>
+          <a href="#" class="remove-tasklist editmode hideme" id="<%= tlist._id %>">
+            <span class="fas fa-times"> </span>
+          </a>
+          <div class="reminderSet-div" style="display: block;">
+            <label for="reminder" class="hideme reminder-<%= tlist._id %>">Reminder (days): </label>
+            <input type="text" class="hideme reminder-edit list-edit-submit reminder-<%= tlist._id %>" name="reminderDays" id="remin-<%= tlist._id %>" value="<%= tlist.reminder %>"  size="2">
+          </div>
+          <br>
+
+          <!-- TASKS -->
+          <ul class="tasklist">
+            <% tasks.forEach(task => { if (String(task.parentListId) == String(tlist._id)) { %>
+            <li class="tasklist-item">
+              <!-- CHECKBOX -->
+              <input type="checkbox" name="task" class="task-checkbox" id="<%= task._id %>"
+                <% if (task.completed) { %>
+                  checked
+                <% } %>                
+              >
+
+              <!-- ce je dueDate blizje kot 2 dni se obarva rdece -->
+              <label for="<%= task._id %>" id="label-<%= task._id %>" style="display:inline;"                
+              class="tasklist-item-name
+                <% if (task.completed) { %>
+                  task-completed
+                <% } else if ((new Date(task.dueDate).getTime()) - (new Date().getTime()) < (1000*60*60*24*tlist.reminder)) { %>
+                  task-is-due
+                <% } %>
+                "><%= task.text %></label>
+              <input type="hidden" class="editbox" id="input-<%= task._id %>" value="<%= task.text %>">
+              <input type="hidden" id="editdate-<%= task._id %>" class="newDueDate" value="<%= new Date(task.dueDate).toISOString().substr(0, 10) %>" />
+              
+              <!-- tags -->
+              <div id="task-tags-<%= task._id %>" class="task-tags">
+                <% task.tags.forEach(tag => { %>
+                  <span id="<%= tag._id %>" class="badge bg-secondary badge-editmode task-badge"><%= tag.tag %> </span>  
+                <% }); %>
+              </div>
+              <a href="#" class="editmode hideme add-tag" id="<%= task._id %>"><span class="badge bg-primary">+</span></a>
+
+              <a href="#" class="edit-task editmode hideme" id="<%= task._id %>">
+                <span class="fas fa-edit"></span>
+              </a>
+              <a href="#" class="remove-task editmode hideme" id="<%= task._id %>">
+                <span class="fas fa-times"></span>
+              </a>
+            </li>
+            <% }}) %>
+          </ul>
+
+          <form action="/tasks" method="POST" class="">
+            <input type="hidden" name="parentListId" value="<%= tlist._id %>" />
+            <input type="text" name="text" placeholder="New Task Description ..." />
+            <input type="date" id="due" name="dueDate" class="datePick"/>
+            <button type="submit">
+              <span class="fas fa-plus"></span>
+            </button>
+          </form>
+        </div>
+        <% }) %>
+      </div>
+    </div>
+  </div>
+</body>
+<script>
+  const getCookieValue = (name) => (
+    document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)')?.pop() || ''
+  )
+
+  window.onbeforeunload = function(event) {
+    if ($('#switchEditMode').prop('checked'))
+      document.cookie = 'editMode=true;secure'
+    else
+      document.cookie = 'editMode=false;secure'
+  };
+  
+  $(document).ready(function() {    
+    if (getCookieValue('editMode') === 'true') {
+      $('#switchEditMode').prop('checked', true)
+      $('.editmode').toggleClass('hideme')  
+      $('.badge-editmode').toggleClass('bg-secondary bg-danger');
+      removeTagEvent();
+    }
+    else
+      $('#switchEditMode').prop('checked', false)
+  });
+
+  Date.prototype.toDateInputValue = (function() {
+    var local = new Date(this);
+    local.setMinutes(this.getMinutes() - this.getTimezoneOffset());
+    return local.toJSON().slice(0,10);
+  });
+
+  $('.datePick').val(new Date().toDateInputValue());
+
+  $('.remove-task').on('click', function () {
+    var id = this.id;
+    $.ajax({
+      url: '/tasks/' + id,
+      method: 'DELETE',
+    }).done(() => {
+      window.location.reload();
+    });
+  });
+
+  function edittask(id) {
+    var label = document.getElementById('label-' + id)
+    var input = document.getElementById('input-' + id)
+    var date = document.getElementById('editdate-' + id)
+
+    if (input.type === "hidden")
+      input.type = "text";      
+    else
+      input.type = "hidden";
+
+    if (date.type === "hidden")
+      date.type = "date";      
+    else
+      date.type = "hidden";
+
+    if (label.style.display === "none") 
+      label.style.display = "inline";
+    else 
+      label.style.display = "none";
+  }
+
+  $('.edit-task').on('click', function () {
+    var id = this.id;
+    edittask(id);
+  });
+
+  // submit change of task
+  $('.editbox').keypress(function (e) {
+    var id = this.id.substring(6); // odrezemo del ki ni id na zacetku
+    var date = document.getElementById('editdate-' + id)
+    if (e.which == 13) {
+      $.ajax({
+        url: '/tasks/' + id + '?newText=' + this.value + '&newDueDate=' + date.value,
+        method: 'PUT',
+      }).done(() => {
+        window.location.reload();
+      });
+    }
+  });
+
+  $('.edit-tasklist').on('click', function () {
+    var id = this.id;
+    var label = document.getElementById('label-' + id) // h2 actually, not label
+    var input = document.getElementById('input-' + id)
+    var date = document.getElementById('editdate-' + id)
+
+    $('.reminder-' + id).toggleClass('hideme')
+
+    if (input.type === "hidden")
+      input.type = "text";      
+    else
+      input.type = "hidden";
+
+    if (date.type === "hidden")
+      date.type = "date";      
+    else
+      date.type = "hidden";
+
+    if (label.style.display === "none") 
+      label.style.display = "inline";
+    else 
+      label.style.display = "none";
+  });
+
+  // submit change of tasklist
+  $('.list-edit-submit').keypress(function (e) {
+    var id = this.id.substring(6); // odrezemo del ki ni id na zacetku
+    var text = document.getElementById('input-' + id)
+    var reminder = document.getElementById('remin-' + id)
+    var date = document.getElementById('editdate-' + id)
+    if (e.which == 13) {
+      $.ajax({
+        url: '/tasklist/' + id + '?newText=' + text.value + '&newDueDate=' + date.value + '&newReminder=' + reminder.value,
+        method: 'PUT',
+      }).done(() => {
+        window.location.reload();
+      });
+    }
+  });
+
+  $('.remove-tasklist').on('click', function () {
+    var id = this.id;
+    $.ajax({
+      url: '/tasklist/' + id,
+      method: 'DELETE',
+    }).done(() => {
+      window.location.reload();
+    });
+  });
+
+  $('.add-tag').on('click', function () {
+    var id = this.id;
+    var newTag = document.createElement('span');
+    newTag.classList.add('badge', 'bg-secondary', 'badge-editmode', 'task-badge');
+    var newInput = document.createElement('input');
+    newInput.classList.add('new-tag-input');
+    newInput.id = id;
+    newInput.setAttribute('size', 8);
+    newTag.append(newInput);
+    $('#task-tags-' + id).append(newTag);
+
+    $('.new-tag-input').keypress(function (e) {
+      if (e.which == 13 && this.value != '') {
+        $.ajax({
+          url: '/tasks/' + this.id + '/tags',
+          method: 'PATCH',
+          data: { tag: this.value},
+        }).done((tagid) => {
+          parentSpan = this.parentNode;
+          parentSpan.innerHTML = '';
+          tag = document.createTextNode(this.value);
+          parentSpan.append(tag);
+          parentSpan.classList.replace('bg-secondary', 'bg-danger');
+          parentSpan.id = tagid;
+          removeTagEvent()
+        });
+      }
+      if (e.key === 'Escape') {
+        console.log('escaped');
+      }
+    });
+  });
+
+  $('.add-tag-tlist').on('click', function () {
+    var id = this.id;
+    var newTag = document.createElement('span');
+    newTag.classList.add('badge', 'bg-secondary', 'badge-editmode', 'list-badge');
+    var newInput = document.createElement('input');
+    newInput.classList.add('new-tag-input');
+    newInput.id = id;
+    newInput.setAttribute('size', 8);
+    newTag.append(newInput);
+    $('#tasklist-tags-' + id).append(newTag);
+
+    $('.new-tag-input').keypress(function (e) {
+      if (e.which == 13 && this.value != '') {
+        $.ajax({
+          url: '/tasklist/' + this.id + '/tags',
+          method: 'PATCH',
+          data: { tag: this.value},
+        }).done((tagid) => {
+          parentSpan = this.parentNode;
+          parentSpan.innerHTML = '';
+          tag = document.createTextNode(this.value);
+          parentSpan.append(tag);
+          parentSpan.classList.replace('bg-secondary', 'bg-danger');
+          parentSpan.id = tagid;
+          removeTagEvent()
+        });
+      }
+      if (e.key === 'Escape') {
+        console.log('escaped');
+      }
+    });
+  });
+
+  $('.task-checkbox').on('click', function () {
+    var id = this.id;
+    $.ajax({
+      url: '/tasks/' + id + '/togglecomplete',
+      method: 'PATCH',
+    }).done(() => {
+      $('label[for='+this.id+']').toggleClass('task-completed')
+    });
+  });
+
+  $('#switchEditMode').on('click', function () {
+    $('.editmode').toggleClass('hideme');
+    $('.badge-editmode').toggleClass('bg-secondary bg-danger');
+    removeTagEvent();
+  });
+
+  function removeTagEvent() {    
+    $('span.bg-danger.task-badge').on('click', function () {
+      parentDiv = this.parentNode;
+      taskID = parentDiv.id.substring(10);
+      $.ajax({
+          url: '/tasks/' + taskID + '/tags?tagid=' + this.id,
+          method: 'DELETE',
+        }).done(() => {
+          this.remove()
+        });
+    })
+
+    $('span.bg-danger.list-badge').on('click', function () {
+      parentDiv = this.parentNode;
+      taskID = parentDiv.id.substring(14);
+      $.ajax({
+          url: '/tasklist/' + taskID + '/tags?tagid=' + this.id,
+          method: 'DELETE',
+        }).done(() => {
+          this.remove()
+        });
+    })
+  }
+</script>
