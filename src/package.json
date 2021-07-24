@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "debug": "nodemon --inspect app.js -e ejs,js --watch ../",
+    "dev": "nodemon app.js -e ejs,js --watch ../"
   },
   "author": "Luka Ernestini",
   "license": "ISC",
@@ -14,5 +15,8 @@
     "handlebars": "^4.7.7",
     "mongoose": "^5.13.3",
     "path": "^0.12.7"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.12"
   }
 }
