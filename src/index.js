@@ -4,6 +4,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const hbs = require('hbs');
+const auth = require('./middleware/auth');
 
 const app = express();
 
@@ -30,5 +31,9 @@ app.use(urlencodedParser);
 // Routers
 const userRouter = require('./routers/user');
 app.use(userRouter);
+
+app.post('/welcome', auth, (req, res) => {
+  res.status(200).send('Welcome 🙌 ');
+});
 
 app.listen(process.env.PORT, () => console.log('Server up and running'));
