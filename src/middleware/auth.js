@@ -18,6 +18,8 @@ const auth = async (req, res, next) => {
       _id: decoded._id,
       'tokens.token': token,
     });
+
+    req.user = user;
     next();
   } catch (error) {
     return res.status(401).send('Invalid token.');
