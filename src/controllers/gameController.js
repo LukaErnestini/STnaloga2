@@ -22,9 +22,10 @@ const gameController = {
   async new(req, res) {
     try {
       const game = new Game({});
-
+      // TODO
+      console.log('this probably does not work');
       // Add authenticated user to the list of players
-      game.players.append(req.user);
+      game.players.push(req.user);
 
       await game.save();
     } catch (e) {
@@ -36,10 +37,11 @@ const gameController = {
     try {
       const game = new Game({});
 
-      playerLookup = game.players.indexOf(req.user._id);
-
-      // Add authenticated user to the list of players
-      game.players.append(req.user);
+      playerLookup = game.players.indexOf(req.user);
+      // TODO
+      console.log('this probably does not work');
+      // Add authenticated user to the list of players if not in already
+      if (playerLookup === -1) game.players.push(req.user);
 
       await game.save();
     } catch (e) {

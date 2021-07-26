@@ -23,6 +23,22 @@ const userSchema = new mongoose.Schema(
       required: true,
       minlength: 6,
     },
+    points: {
+      type: Number,
+      default: 0,
+    },
+    gamesCount: {
+      type: Number,
+      default: 0,
+    },
+    correctGuessCount: {
+      type: Number,
+      default: 0,
+    },
+    winsCount: {
+      type: Number,
+      default: 0,
+    },
     tokens: [
       {
         token: {
