@@ -24,7 +24,7 @@ router.get('/game/:gid', auth, async (req, res) => {
 router.post('/game/new', auth, async (req, res) => {
   try {
     // TODO randomly select from list of words
-    var words = [
+    var EXAMPLEwords = [
       'banana',
       'tipkovnica',
       'monitor',
@@ -35,7 +35,7 @@ router.post('/game/new', auth, async (req, res) => {
       'sladoled',
     ];
     const game = new Game({
-      words,
+      EXAMPLEwords,
     });
 
     // Add authenticated user to the list of players
