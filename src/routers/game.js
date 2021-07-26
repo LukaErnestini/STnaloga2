@@ -2,49 +2,11 @@ const express = require('express');
 const Game = require('../models/game');
 const auth = require('../middleware/auth');
 const router = new express.Router();
+const gameController = require('../controllers/gameController');
 
-router.get('/games', auth, async (req, res) => {
-  try {
-    const games = await Game.find({});
-    res.status(200).json({ games });
-  } catch (e) {
-    res.status(400).send(e);
-  }
-});
-
-router.get('/game/:gid', auth, async (req, res) => {
-  try {
-    const game = await Game.findById(req.params.qid);
-    res.status(200).json({ game });
-  } catch (e) {
-    res.status(400).send(e);
-  }
-});
-
-router.post('/game/new', auth, async (req, res) => {
-  try {
-    // TODO randomly select from list of words
-    var EXAMPLEwords = [
-      'banana',
-      'tipkovnica',
-      'monitor',
-      'nosorog',
-      'svetloba',
-      'cepivo',
-      'podstavek',
-      'sladoled',
-    ];
-    const game = new Game({
-      EXAMPLEwords,
-    });
-
-    // Add authenticated user to the list of players
-    game.players.append(req.user);
-
-    await game.save();
-  } catch (e) {
-    res.status(400).send(e);
-  }
-});
+router.get('/games', auth, gameController.getAll);
+router.get('/game/:gid', auth, gameController.getOne);
+router.post('/game/new', auth, gameController.new);
+router.post('/game/join', auth, gameController.join);
 
 module.exports = router;
