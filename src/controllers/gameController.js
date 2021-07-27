@@ -4,7 +4,8 @@ const gameController = {
   async getAll(req, res) {
     try {
       const games = await Game.find({});
-      res.status(200).json({ games });
+      // res.status(200).json({ games });
+      res.status(200).render('game', { games });
     } catch (e) {
       res.status(400).send(e);
     }
