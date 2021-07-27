@@ -71,9 +71,8 @@
                 username: $('#username').val(),
                 password: $('#password').val()
             },
-        }).done((res) => {
-            console.log(res)
-            //location.href = '/';
+        }).done((res) => { //TODO if username/mail taken notify of this
+            location.href = '/games';
         });
     })
 </script>
