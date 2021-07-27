@@ -2,6 +2,7 @@ require('dotenv').config();
 require('./db/mongoose');
 const express = require('express');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const path = require('path');
 const hbs = require('hbs');
 const auth = require('./middleware/auth');
@@ -27,6 +28,7 @@ const jsonParser = bodyParser.json();
 var urlencodedParser = bodyParser.urlencoded({ extended: false });
 app.use(jsonParser);
 app.use(urlencodedParser);
+app.use(cookieParser());
 
 // Routers
 const userRouter = require('./routers/user');
@@ -34,6 +36,15 @@ app.use(userRouter);
 
 app.post('/welcome', auth, (req, res) => {
   res.status(200).send('Welcome 🙌 ');
+});
+
+app.get('/', (req, res) => {
+  try {
+    if (!req.cookies.token) res.redirect('/login');
+    res.send('landing page lol');
+  } catch (error) {
+    res.status(500).send(error);
+  }
 });
 
 app.listen(process.env.PORT, () => console.log('Server up and running'));

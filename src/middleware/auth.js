@@ -7,7 +7,8 @@ const auth = async (req, res, next) => {
       req.header('Authorization').replace('Bearer ', '') ||
       req.body.token ||
       req.query.token ||
-      req.headers['x-access-token'];
+      req.headers['x-access-token'] ||
+      req.cookies.token;
 
     if (!token) {
       return res.status(403).send('A token is required for authentication');
