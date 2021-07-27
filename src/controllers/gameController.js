@@ -15,8 +15,11 @@ const gameController = {
   async getOne(req, res) {
     try {
       const game = await Game.findById(req.params.qid);
-      //res.status(200).json({ game });
-      res.status(200).render('game', { game });
+      game.populate('players');
+      res.status(200).render('game', {
+        game,
+        owner: game.players[0],
+      });
     } catch (e) {
       res.status(400).send(e);
     }
