@@ -4,12 +4,7 @@ const User = require('../models/user');
 const auth = async (req, res, next) => {
   try {
     const token =
-      req.header('Authorization').replace('Bearer ', '') ||
-      req.body.token ||
-      req.query.token ||
-      req.headers['x-access-token'] ||
-      req.cookies.token;
-
+      req.cookies.token || req.header('Authorization').replace('Bearer ', '');
     if (!token) {
       return res.status(403).send('A token is required for authentication');
     }
