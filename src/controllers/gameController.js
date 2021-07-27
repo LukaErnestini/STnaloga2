@@ -37,7 +37,7 @@ const gameController = {
   async join(req, res) {
     try {
       const game = await Game.findById(req.body.id);
-      playerLookup = game.players.indexOf(req.user);
+      playerLookup = game.players.indexOf(req.user._id);
       // Add authenticated user to the list of players if not in already
       if (playerLookup === -1) game.players.push(req.user);
       await game.save();
