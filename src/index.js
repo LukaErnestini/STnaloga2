@@ -32,7 +32,9 @@ app.use(cookieParser());
 
 // Routers
 const userRouter = require('./routers/user');
+const gameRouter = require('./routers/game');
 app.use(userRouter);
+app.use(gameRouter);
 
 app.post('/welcome', auth, (req, res) => {
   res.status(200).send('Welcome 🙌 ');
@@ -41,7 +43,7 @@ app.post('/welcome', auth, (req, res) => {
 app.get('/', (req, res) => {
   try {
     if (!req.cookies.token) res.redirect('/login');
-    res.send('landing page lol');
+    res.redirect('/games');
   } catch (error) {
     res.status(500).send(error);
   }
