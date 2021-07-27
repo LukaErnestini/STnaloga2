@@ -14,8 +14,7 @@ const gameController = {
 
   async getOne(req, res) {
     try {
-      const game = await Game.findById(req.params.qid);
-      game.populate('players');
+      const game = await Game.findById(req.params.gid).populate('players');
       res.status(200).render('game', {
         game,
         owner: game.players[0],
