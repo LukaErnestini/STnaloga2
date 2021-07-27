@@ -61,20 +61,5 @@
         </div>
     </section>
 </body>
-<script>
-    $('#register-button').on('click', function () {
-        $.ajax({
-            url: '/signup/',
-            method: 'POST',
-            data: {
-                email: $('#email').val(),
-                username: $('#username').val(),
-                password: $('#password').val()
-            },
-        }).done((res) => { //TODO if username/mail taken notify of this
-            location.href = '/games';
-        });
-    })
-</script>
-
+{{>footer}}
 </html>

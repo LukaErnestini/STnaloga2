@@ -52,19 +52,6 @@
         </div>
     </section>
 </body>
-<script>
-    $('#login-button').on('click', function () {
-        $.ajax({
-            url: '/login/',
-            method: 'POST',
-            data: {
-                username: $('#username').val(),
-                password: $('#password').val()
-            },
-        }).done((res) => { //TODO if not successful, notify
-            location.href = '/games';
-        });
-    })
-</script>
+{{>footer}}
 
 </html>
