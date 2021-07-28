@@ -13,13 +13,20 @@
         <div class="col-md-auto">
             <div class="container">
                 <div class="row">
-                    <div id='waitroom' class="col-5 inactive">
+                    <div id='waitroom' class="col-md-auto">
                         <h2>Players:</h2>
                         <ul id="playerlist"></ul>
                     </div>
                     <div id='game' class="col-md-auto ">
-                        <canvas id="canvas" class="me-4" width="500" height="500"></canvas>
-                        <button id="clear-button" type="button" class="btn btn-danger">Clear</button>
+                        <div class="d-flex justify-content-between">
+                            <h2 id="aboveCanvasText" class="float-right">Draw:</h2>
+                            <h1 id='word'>BANANA</h1>
+                            <h3 id="turnCounter">5/8</h3>
+                        </div>
+                        <canvas id="canvas" width="500" height="500"></canvas>
+                        <div class="btn-group-canvas">
+                            <button id="clear-button" type="button" class="btn btn-danger">Clear</button>
+                        </div>
                     </div>
                     <div id='chat' class="col-md-auto">
                         <label for="chat-textarea">Chat:</label>

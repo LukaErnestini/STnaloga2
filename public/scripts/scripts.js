@@ -1,6 +1,7 @@
 $(document).ready(function () {
-  if (!localStorage.getItem('username'))
-    $('#logout-button').prop('disabled', true);
+  var username = localStorage.getItem('username');
+  if (!username) $('#logout-button').prop('disabled', true);
+  else $('#username-link').text(username);
 });
 
 $('#register-button').on('click', function () {
