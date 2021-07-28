@@ -72,6 +72,10 @@ io.on('connection', (socket) => {
   }
   socket.emit('users', users);
 
+  socket.on('draw', (data) => {
+    socket.broadcast.emit('draw', data.positions);
+  });
+
   socket.on('chat message', (msg) => {
     io.emit('chat message', socket.username + ': ' + msg);
   });

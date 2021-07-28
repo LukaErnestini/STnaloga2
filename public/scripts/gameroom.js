@@ -57,27 +57,26 @@ var ctx = canvas.getContext('2d');
 
 // last known position
 var pos = { x: 0, y: 0 };
+var positions = [];
 
-window.addEventListener('resize', resize);
 document.addEventListener('mousemove', draw);
 document.addEventListener('mousedown', setPosition);
 document.addEventListener('mouseenter', setPosition);
+document.addEventListener('mouseup', stopDrawing);
+document.addEventListener('mouseleave', stopDrawing);
 
-// new position from mouse event
-// function setPosition(e) {
-//   pos.x = e.clientX;
-//   pos.y = e.clientY;
-// }
 function setPosition(evt) {
   var rect = canvas.getBoundingClientRect();
   pos.x = evt.clientX - rect.left;
   pos.y = evt.clientY - rect.top;
+  positions.push({ x: pos.x, y: pos.y });
 }
 
-// resize canvas
-function resize() {
-  ctx.canvas.width = window.innerWidth;
-  ctx.canvas.height = window.innerHeight;
+function stopDrawing() {
+  // draw the line
+  // SOCKET.IO SYNC
+  if (positions.length > 1) socket.emit('draw', { positions });
+  positions = []; //clear
 }
 
 function draw(e) {
@@ -91,11 +90,24 @@ function draw(e) {
   ctx.strokeStyle = '#c0392b';
 
   ctx.moveTo(pos.x, pos.y); // from
+
   setPosition(e);
   ctx.lineTo(pos.x, pos.y); // to
 
   ctx.stroke(); // draw it!
 }
+
+socket.on('draw', function replicate(positions) {
+  for (let i = 1; i < positions.length - 1; i += 1) {
+    ctx.beginPath(); // begin
+    ctx.lineWidth = 5;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = '#c0392b';
+    ctx.moveTo(positions[i].x, positions[i].y); // from
+    ctx.lineTo(positions[i + 1].x, positions[i + 1].y); // to
+    ctx.stroke(); // draw it!
+  }
+});
 
 $('#clear-button').on('click', function () {
   ctx.clearRect(0, 0, 3000, 3000);
