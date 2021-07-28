@@ -62,6 +62,14 @@ const userController = {
       res.status(500).send();
     }
   },
+  async showProfile(req, res) {
+    try {
+      const user = await User.findById(req.query.tid);
+      res.status(200).render('profile', { user });
+    } catch (e) {
+      res.status(500).send('Error');
+    }
+  },
 };
 
 module.exports = userController;

@@ -4,9 +4,54 @@
 
 <head>
     {{>head}}
-
 </head>
 
 <body>
+    <div class="container">
+        <div class="row justify-content-md-center">
+            <div class="col-md-4">
+                <h2>{{user.username}}</h2>
+                <table class="table table-borderless">
+                    <tbody>
+                        <tr>
+                            <th>
+                                Games
+                            </th>
+                            <td>
+                                {{user.gamesCount}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                Wins
+                            </th>
+                            <td>
+                                {{user.winsCount}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                Correct Guesses
+                            </th>
+                            <td>
+                                {{user.correctGuessCount}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                Lifetime Score
+                            </th>
+                            <td>
+                                {{user.points}}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
 </body>
+{{>footer}}
+
+</html>
