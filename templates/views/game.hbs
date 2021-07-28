@@ -8,5 +8,33 @@
 </head>
 
 <body>
+<div class="container">
+    <div class="row justify-content-md-center">
+        <div class="col-md-auto">
+            <div class="container">
+                <div class="row">
+                    <div id='waitroom' class="col-5 inactive">
+                        status
+                    </div>
+                    <div id='game' class="col-md-auto">
+                        <canvas id="canvas" class="me-4" width="500" height="500">
 
+                        </canvas>
+                    </div>
+                    <div id='chat' class="col-5">
+                        <textarea name="chatarea" id="chat-textarea" cols="30" rows="10">
+test
+test
+                        </textarea>
+                        <form id="form" action="">
+                            <input id="input" autocomplete="off" /><button>Send</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
+{{>footer}}
+</html>
