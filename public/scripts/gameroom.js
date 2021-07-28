@@ -20,8 +20,11 @@ socket.on('users', function (users) {
   $playerlist.empty();
   users.forEach((user) => {
     var li = document.createElement('li');
-    li.id = user.userID;
-    li.innerHTML = user.username;
+    var a = document.createElement('a');
+    //li.id = user.userID;
+    a.href = '/profile/' + user.username;
+    a.innerHTML = user.username;
+    li.append(a);
     $playerlist.append(li);
   });
 });

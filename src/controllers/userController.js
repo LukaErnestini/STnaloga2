@@ -64,8 +64,16 @@ const userController = {
   },
   async showProfile(req, res) {
     try {
-      const user = await User.findById(req.query.tid);
-      res.status(200).render('profile', { user });
+      const user = await User.find({ username: req.params.usr });
+      res.status(200).render('profile', { user: user[0] });
+    } catch (e) {
+      res.status(500).send('Error');
+    }
+  },
+  async showProfileSelf(req, res) {
+    try {
+      console.log(req.user);
+      res.status(200).render('profile', { user: req.user });
     } catch (e) {
       res.status(500).send('Error');
     }
