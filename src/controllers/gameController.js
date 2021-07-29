@@ -12,12 +12,20 @@ const gameController = {
     }
   },
 
+  async getAllJSON(req, res) {
+    try {
+      const games = await Game.find({}).populate('players');
+      res.status(200).json({ games });
+    } catch (e) {
+      res.status(400).send(e);
+    }
+  },
+
   async getOne(req, res) {
     try {
       const game = await Game.findById(req.params.gid).populate('players');
       res.status(200).render('game', {
         game,
-        owner: game.players[0],
       });
     } catch (e) {
       res.status(400).send(e);
@@ -26,7 +34,7 @@ const gameController = {
 
   async new(req, res) {
     try {
-      const game = new Game({});
+      const game = new Game({ playerPoints: { sample: -1 } });
       // Add authenticated user to the list of players
       game.players.push(req.user);
       await game.save();
@@ -44,6 +52,26 @@ const gameController = {
       if (playerLookup === -1) game.players.push(req.user);
       await game.save();
       res.status(201).json({ game });
+    } catch (e) {
+      res.status(400).send(e);
+    }
+  },
+
+  async leave(req, res) {
+    try {
+      const game = await Game.findById(req.params.gid);
+
+      game.players = game.players.filter((player) => {
+        return !(player.toString() === req.user._id.toString());
+      });
+
+      if (game.players.length === 0) {
+        await Game.findOneAndDelete({ _id: req.params.gid });
+        res.status(200).send();
+      }
+
+      await game.save();
+      res.status(200).json({ game });
     } catch (e) {
       res.status(400).send(e);
     }

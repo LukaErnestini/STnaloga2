@@ -10,25 +10,29 @@
     <button id='new-game-button' type="button" class="btn btn-primary">New Game</button>
     <div class="list-group mt-4">
         <h2>Rooms:</h2>
-
-        {{#each games }}
-        <button 
-            id={{this._id}}
-            type="button"
-            class="game-button list-group-item list-group-item-action"
-            aria-current="true"
-            {{#if this.started}}
-            disabled
-            {{/if}}
-        >
-        {{#each this.players}}
-        {{this.username}}
-        {{/each}}
-        </button>
-        {{/each }}
-
+        <div id="gamelist">
+            {{#each games }}
+            <button 
+                id={{this._id}}
+                type="button"
+                class="game-button list-group-item list-group-item-action"
+                aria-current="true"
+                {{#if this.started}}
+                disabled
+                {{/if}}
+            >
+            {{#each this.players}}
+            {{this.username}}
+            {{/each}}
+            </button>
+            {{/each }}
+        </div>
     </div>
 
 </body>
 {{>footer}}
+<script>
+    getGames();
+    setInterval(getGames, 2000);
+</script>
 </html>

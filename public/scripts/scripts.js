@@ -63,18 +63,43 @@ $('#new-game-button').on('click', function () {
     });
 });
 
-// Join game
-$('.game-button').on('click', function () {
-  var id = this.id;
+function getGames() {
   $.ajax({
-    url: '/game/join',
+    url: '/games',
     method: 'POST',
-    data: { id },
   })
     .done((res) => {
-      location.href = '/game/' + id;
+      var listdiv = $('#gamelist');
+      listdiv.empty();
+      res.games.forEach((game) => {
+        var button = document.createElement('button');
+        button.id = game._id;
+        button.className = 'game-button list-group-item list-group-item-action';
+        if (game.started) button.disabled = true;
+        game.players.forEach((player) => {
+          button.innerHTML += player.username + ', ';
+        });
+        button.innerHTML = button.innerHTML.slice(0, -2);
+        listdiv.append(button);
+      });
+
+      // Join game
+      $('.game-button').on('click', function () {
+        var id = this.id;
+        $.ajax({
+          url: '/game/join',
+          method: 'POST',
+          data: { id },
+        })
+          .done((res) => {
+            location.href = '/game/' + id;
+          })
+          .fail((e) => {
+            console.log(e);
+          });
+      });
     })
     .fail((e) => {
       console.log(e);
     });
-});
+}

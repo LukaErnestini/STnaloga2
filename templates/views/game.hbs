@@ -14,14 +14,18 @@
             <div class="container">
                 <div class="row">
                     <div id='waitroom' class="col-md-auto">
-                        <h2>Players:</h2>
+                        <h3>Players:</h3>
                         <ul id="playerlist"></ul>
+                        <h4 id="time">03:00</h4>
+                        <button id="start-button" type="button" class="btn btn-success inactive">Start</button>
+                        <button id="leave-button" type="submit" class="btn btn-danger">Leave</button>      
                     </div>
-                    <div id='game' class="col-md-auto ">
+                    <input type="hidden" id="gameID" value="{{game._id}}">
+                    <div id='game' class="col-md-auto inactive">
                         <div class="d-flex justify-content-between">
-                            <h2 id="aboveCanvasText" class="float-right">Draw:</h2>
-                            <h1 id='word'>BANANA</h1>
-                            <h3 id="turnCounter">5/8</h3>
+                            <h2 id="aboveCanvasText" class="float-right"></h2>
+                            <h1 id='word'></h1>
+                            <h3 id="turnCounter"></h3>
                         </div>
                         <canvas id="canvas" width="500" height="500"></canvas>
                         <div class="btn-group-canvas">

@@ -1,8 +1,14 @@
+var countdown;
 var username = localStorage.getItem('username');
-var socket = io();
+// const socket = io({ auth: { username, gameid: '1234' } });
+const socket = io('http://localhost:3000/', {
+  auth: {
+    x: username,
+    gid: $('#gameID').val(),
+  },
+});
 // TODO io now connect without username first, then with username, cause I don't know how to from the getgo
-socket.auth = { username };
-socket.connect();
+// socket.auth = { auth: {username, gameid: '1234'} };
 
 socket.on('connect_error', (err) => {
   if (err.message === 'invalid username') {
@@ -15,10 +21,20 @@ socket.onAny((event, ...args) => {
   console.log(event, args);
 });
 
-socket.on('users', function (users) {
+socket.on('gameplayers', function (data) {
+  // First on the list is the GAME OWNER, who can start the game
+  if (
+    data.users[0].username === username &&
+    data.users.length >= 3 &&
+    !data.started
+  ) {
+    $('#start-button').removeClass('inactive');
+    //$('#start-button').addClass('ianimate__animated animate__bounce');
+  }
+
   var $playerlist = $('#playerlist');
   $playerlist.empty();
-  users.forEach((user) => {
+  data.users.forEach((user) => {
     var li = document.createElement('li');
     var a = document.createElement('a');
     //li.id = user.userID;
@@ -31,10 +47,14 @@ socket.on('users', function (users) {
 
 socket.on('chat message', function (msg) {
   var chat = $('#chat-textarea');
+  //$(chat).addClass('ianimate__animated animate__bounce');
   var oldContent = chat.val();
   chat.val(oldContent + '\n' + msg);
   chat.scrollTop(chat[0].scrollHeight);
 });
+
+// send game id
+socket.emit('gameid', { gameid: $('#gameID').val() });
 
 form.addEventListener('submit', function (e) {
   e.preventDefault();
@@ -45,6 +65,87 @@ form.addEventListener('submit', function (e) {
     input.val('');
   }
 });
+
+$('#start-button').on('click', function () {
+  socket.emit('start', true);
+});
+
+socket.on('finished', function (data) {
+  $('#aboveCanvasText').html('Winner: ' + data.winner[0]);
+  $('#word').html(data.winner[1] + ' points!');
+  $('#time').addClass('inactive');
+  $('#game').removeClass('inactive');
+  $('#game').addClass('animate__animated animate__bounce blink_me');
+
+  $('#leave-button').removeClass('inactive');
+  document.removeEventListener('mousemove', draw);
+  document.removeEventListener('mousedown', setPosition);
+  document.removeEventListener('mouseenter', setPosition);
+  document.removeEventListener('mouseup', stopDrawing);
+  document.removeEventListener('mouseleave', stopDrawing);
+});
+
+socket.on('start', function (data) {
+  $('#game').removeClass('inactive');
+  $('#start-button').addClass('inactive');
+  var threeMinutes = 60 * 3;
+  if (data.elapsedTime) threeMinutes -= data.elapsedTime;
+  var display = document.querySelector('#time');
+  clearInterval(countdown);
+  startTimer(threeMinutes, display);
+  if (data.move === username) {
+    // ta igralec je na vrsti
+    $('#aboveCanvasText').html('Draw:');
+    $('#word').html(data.word);
+    $('#turnCounter').html(data.round + '/' + data.totalRounds);
+    document.addEventListener('mousemove', draw);
+    document.addEventListener('mousedown', setPosition);
+    document.addEventListener('mouseenter', setPosition);
+    document.addEventListener('mouseup', stopDrawing);
+    document.addEventListener('mouseleave', stopDrawing);
+    $('#clear-button').prop('disabled', false);
+  } else {
+    // tej igralci ugibajo
+    $('#aboveCanvasText').html('Guess the word!');
+    $('#word').html('');
+    $('#turnCounter').html(data.round + '/' + data.totalRounds);
+    $('#clear-button').prop('disabled', true);
+    document.removeEventListener('mousemove', draw);
+    document.removeEventListener('mousedown', setPosition);
+    document.removeEventListener('mouseenter', setPosition);
+    document.removeEventListener('mouseup', stopDrawing);
+    document.removeEventListener('mouseleave', stopDrawing);
+  }
+});
+
+function timeToSeconds(t) {
+  var seconds = 0;
+  var time = t.match(/(\d+)(?::(\d\d))?\s*(p?)/);
+  seconds = (parseInt(time[1]) + (time[3] ? 12 : 0)) * 60;
+  seconds += parseInt(time[2]) || 0;
+  return seconds;
+}
+
+// TIMER
+function startTimer(duration, display) {
+  var timer = duration;
+  var minutes;
+  var seconds;
+  countdown = setInterval(function () {
+    minutes = parseInt(timer / 60, 10);
+    seconds = parseInt(timer % 60, 10);
+
+    minutes = minutes < 10 ? '0' + minutes : minutes;
+    seconds = seconds < 10 ? '0' + seconds : seconds;
+
+    display.textContent = minutes + ':' + seconds;
+
+    if (--timer < 0) {
+      socket.emit('timesup', { secondsLeft: timeToSeconds($('#time').html()) });
+      clearInterval(countdown);
+    }
+  }, 1000);
+}
 
 // DRAWING
 // get canvas
@@ -112,6 +213,31 @@ socket.on('draw', function replicate(positions) {
   }
 });
 
+socket.on('clear', function clear() {
+  ctx.clearRect(0, 0, 3000, 3000);
+});
+
+socket.on('goodGuess', function sound1() {
+  var snd = new Audio('/audio/mixkit-retro-game-notification-212.wav'); // buffers automatically when created
+  snd.play();
+});
+
+socket.on('win', function sound2() {
+  var snd = new Audio('/audio/mixkit-male-voice-cheer-2010.wav'); // buffers automatically when created
+  snd.play();
+});
+
 $('#clear-button').on('click', function () {
   ctx.clearRect(0, 0, 3000, 3000);
+  socket.emit('clear');
+});
+
+$('#leave-button').on('click', function () {
+  socket.disconnect();
+  $.ajax({
+    url: '/game/' + $('#gameID').val() + '/leave',
+    method: 'PUT',
+  }).done((res) => {
+    location.href = '/games';
+  });
 });
